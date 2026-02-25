@@ -1,0 +1,33 @@
+import numpy as np
+import pandas as pd
+
+# Modified dataset with Purchase Amount (numerical)
+data = pd.DataFrame({
+    'Age': [22,25,28,30,35,40,45,50,23,27,29,32,38,42,26,31,36,48,52,24],
+    'Salary': [15000,20000,25000,30000,35000,40000,45000,50000,48000,52000,
+               58000,60000,65000,70000,72000,80000,85000,90000,100000,120000],
+    'PurchaseAmount': [2000,2500,3000,3500,5000,6000,7000,8000,4000,6500,
+                       7200,7500,9000,9500,6800,8200,8800,11000,12000,5000]
+})
+
+# Features (X) and Target (y)
+X = data[['Age', 'Salary']].values
+y = data['PurchaseAmount'].values
+
+# Add intercept column (1's)
+ones = np.ones((X.shape[0], 1))
+X = np.hstack((ones, X))
+
+# -------- NORMAL EQUATION --------
+beta = np.linalg.inv(X.T @ X) @ X.T @ y
+
+print("Intercept (β0):", beta[0])
+print("Age Coefficient (β1):", beta[1])
+print("Salary Coefficient (β2):", beta[2])
+
+# -------- Prediction Example --------
+# Example: Age = 30, Salary = 60000
+new_input = np.array([1, 30, 60000])
+predicted_amount = new_input @ beta
+
+print("\nPredicted Purchase Amount: ₹", round(predicted_amount, 2))
