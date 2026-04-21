@@ -1,0 +1,71 @@
+import pandas as pd
+from google.colab import files
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+import matplotlib.pyplot as plt
+
+# -------------------------------
+# STEP 1: Upload Dataset
+# -------------------------------
+uploaded = files.upload()
+file_path = list(uploaded.keys())[0]
+df = pd.read_csv(file_path)
+
+print("\nColumns:\n", df.columns)
+print("\nPreview:\n", df.head())
+
+# -------------------------------
+# STEP 2: Optional Target (for coloring)
+# -------------------------------
+use_target = input("\nDo you want to use a target column for coloring? (yes/no): ")
+
+if use_target.lower() == 'yes':
+    target_column = input("Enter target column name: ")
+    y = df[target_column]
+    X = df.drop(columns=[target_column])
+else:
+    y = None
+    X = df.copy()
+
+# -------------------------------
+# STEP 3: Handle Missing Values
+# -------------------------------
+X = X.dropna()
+
+# -------------------------------
+# STEP 4: Convert categorical → numeric
+# -------------------------------
+X = pd.get_dummies(X, drop_first=True)
+
+# -------------------------------
+# STEP 5: Scaling (VERY IMPORTANT for PCA)
+# -------------------------------
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# -------------------------------
+# STEP 6: Apply PCA
+# -------------------------------
+pca = PCA(n_components=2)
+X_pca = pca.fit_transform(X_scaled)
+
+# -------------------------------
+# STEP 7: Explained Variance
+# -------------------------------
+print("\nExplained Variance Ratio:", pca.explained_variance_ratio_)
+
+# -------------------------------
+# STEP 8: Plot
+# -------------------------------
+plt.figure()
+
+if y is not None:
+    plt.scatter(X_pca[:, 0], X_pca[:, 1], c=y)
+else:
+    plt.scatter(X_pca[:, 0], X_pca[:, 1])
+
+plt.xlabel("Principal Component 1")
+plt.ylabel("Principal Component 2")
+plt.title("PCA Visualization")
+
+plt.show()
